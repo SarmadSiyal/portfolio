@@ -8,6 +8,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
+  /* ─── GLOBAL CARD KEYFRAMES ─── */
+  @keyframes cardPulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50%       { opacity: 0.85; transform: scale(1.1); }
+  }
+  @keyframes shimmerSweep {
+    0%   { background-position: -600px 0; }
+    100% { background-position: 600px 0; }
+  }
+
+
   :root {
     --bg: #080b12;
     --bg2: #0d1120;
@@ -323,16 +334,47 @@
     gap: 20px;
   }
   .stat-card {
-    background: var(--surface);
+    background: linear-gradient(135deg, rgba(99,210,255,0.05) 0%, rgba(255,255,255,0.03) 100%);
     border: 1px solid var(--border);
     border-radius: var(--r);
     padding: 24px 20px;
-    transition: border-color 0.3s, background 0.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: transform 0.3s ease, border-color 0.3s ease,
+                box-shadow 0.3s ease, background 0.3s ease;
+  }
+  /* Corner glow orb */
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,210,255,0.18) 0%, transparent 70%);
+    top: -20px; right: -20px;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  /* Bottom accent line */
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
   }
   .stat-card:hover {
-    border-color: var(--border2);
-    background: var(--surface2);
+    transform: translateY(-5px) scale(1.02);
+    border-color: rgba(99,210,255,0.28);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.35), 0 0 20px rgba(99,210,255,0.08);
+    background: linear-gradient(135deg, rgba(99,210,255,0.09) 0%, rgba(255,255,255,0.05) 100%);
   }
+  .stat-card:hover::before { transform: scale(1.4); opacity: 1; }
+  .stat-card:hover::after  { transform: scaleX(1); }
   .stat-number {
     font-family: var(--font-display);
     font-size: 2rem;
@@ -340,13 +382,21 @@
     color: var(--accent);
     line-height: 1;
     margin-bottom: 6px;
+    position: relative; z-index: 1;
+    transition: text-shadow 0.3s;
+  }
+  .stat-card:hover .stat-number {
+    text-shadow: 0 0 20px rgba(99,210,255,0.4);
   }
   .stat-label {
     font-size: 0.82rem;
     color: var(--text3);
     font-family: var(--font-mono);
     letter-spacing: 0.05em;
+    position: relative; z-index: 1;
+    transition: color 0.25s;
   }
+  .stat-card:hover .stat-label { color: var(--text2); }
 
   /* ─── EXPERTISE ─── */
   #expertise { background: var(--bg); }
@@ -357,14 +407,17 @@
     margin-top: 50px;
   }
   .expertise-card {
-    background: var(--surface);
+    background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
     border: 1px solid var(--border);
     border-radius: var(--r2);
     padding: 32px 28px;
-    transition: all 0.3s ease;
+    transition: transform 0.35s ease, border-color 0.35s ease,
+                box-shadow 0.35s ease, background 0.35s ease;
     position: relative;
     overflow: hidden;
+    cursor: default;
   }
+  /* Diagonal mesh pattern */
   .expertise-card::before {
     content: '';
     position: absolute;
@@ -372,19 +425,40 @@
     height: 2px;
     background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent)), transparent);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.35s;
+  }
+  /* Large ambient orb bottom-right */
+  .expertise-card::after {
+    content: '';
+    position: absolute;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--card-accent, var(--accent)) 0%, transparent 70%);
+    bottom: -50px; right: -50px;
+    opacity: 0;
+    filter: blur(30px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
   }
   .expertise-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(255,255,255,0.12);
-    background: var(--surface2);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    transform: translateY(-8px);
+    border-color: var(--card-accent, var(--accent));
+    background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+    box-shadow: 0 24px 50px rgba(0,0,0,0.4),
+                0 0 0 1px rgba(255,255,255,0.06),
+                0 0 30px rgba(99,210,255,0.06);
   }
   .expertise-card:hover::before { opacity: 1; }
+  .expertise-card:hover::after  { opacity: 0.12; transform: scale(1.2); }
   .card-icon {
-    font-size: 1.8rem;
+    font-size: 2rem;
     margin-bottom: 16px;
     display: block;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), filter 0.3s;
+  }
+  .expertise-card:hover .card-icon {
+    transform: scale(1.15) rotate(-6deg);
+    filter: drop-shadow(0 0 8px var(--card-accent, var(--accent)));
   }
   .card-title {
     font-family: var(--font-display);
@@ -392,9 +466,13 @@
     font-weight: 700;
     color: var(--text);
     margin-bottom: 14px;
+    transition: color 0.25s;
+    position: relative; z-index: 1;
   }
+  .expertise-card:hover .card-title { color: #fff; }
   .card-list {
     list-style: none;
+    position: relative; z-index: 1;
   }
   .card-list li {
     font-size: 0.85rem;
@@ -404,117 +482,180 @@
     align-items: center;
     gap: 8px;
     border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: color 0.2s, padding-left 0.25s;
   }
   .card-list li:last-child { border-bottom: none; }
+  .expertise-card:hover .card-list li { color: #a8bcd4; padding-left: 4px; }
   .card-list li::before {
     content: '';
     width: 5px; height: 5px;
     border-radius: 50%;
     background: var(--card-accent, var(--accent));
     flex-shrink: 0;
+    transition: box-shadow 0.3s;
+  }
+  .expertise-card:hover .card-list li::before {
+    box-shadow: 0 0 6px var(--card-accent, var(--accent));
   }
 
   /* ─── PROJECTS ─── */
   #projects { background: var(--bg2); }
+
+  /* Stack cards vertically, full-width */
   .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 24px;
     margin-top: 50px;
   }
+
+  /* Each card is a left/right split: text | image */
   .project-card {
-    background: var(--surface);
+    background: linear-gradient(135deg, rgba(99,210,255,0.04) 0%, rgba(167,139,250,0.03) 50%, rgba(255,255,255,0.02) 100%);
     border: 1px solid var(--border);
     border-radius: var(--r2);
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    transition: all 0.3s ease;
-    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
     overflow: hidden;
+    transition: transform 0.38s ease, border-color 0.38s ease,
+                box-shadow 0.38s ease, background 0.38s ease;
+    position: relative;
   }
-  .project-card.featured {
-    grid-column: span 2;
-    border-color: rgba(99,210,255,0.2);
-    background: linear-gradient(135deg, rgba(99,210,255,0.04) 0%, var(--surface) 100%);
-  }
-  .project-card::after {
+
+  /* Mouse-follow glow overlay */
+  .project-card::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(99,210,255,0.04), transparent 60%);
+    background: radial-gradient(circle at var(--mx,30%) var(--my,50%), rgba(99,210,255,0.07), transparent 55%);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.4s;
     pointer-events: none;
+    z-index: 0;
   }
   .project-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(99,210,255,0.18);
-    box-shadow: 0 24px 50px rgba(0,0,0,0.35);
+    transform: translateY(-6px);
+    border-color: rgba(99,210,255,0.28);
+    box-shadow: 0 30px 65px rgba(0,0,0,0.45),
+                0 0 0 1px rgba(99,210,255,0.07),
+                0 0 50px rgba(99,210,255,0.05);
+    background: linear-gradient(135deg, rgba(99,210,255,0.07) 0%, rgba(167,139,250,0.05) 50%, rgba(255,255,255,0.03) 100%);
   }
-  .project-card:hover::after { opacity: 1; }
+  .project-card:hover::before { opacity: 1; }
+
+  /* Featured card: cyan top-accent line */
+  .project-card.featured {
+    border-color: rgba(99,210,255,0.22);
+    background: linear-gradient(135deg, rgba(99,210,255,0.07) 0%, rgba(167,139,250,0.04) 60%, rgba(255,255,255,0.02) 100%);
+  }
+  .project-card.featured::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent) 45%, var(--accent2) 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* ── LEFT: text content pane ── */
+  .project-text {
+    padding: 34px 34px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
   .project-num {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
     color: var(--accent);
-    opacity: 0.6;
+    opacity: 0.65;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
+  .project-num .feat-badge {
+    opacity: 1;
+    background: rgba(99,210,255,0.1);
+    border: 1px solid rgba(99,210,255,0.25);
+    color: var(--accent);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+  }
+
   .project-title {
     font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--text);
     line-height: 1.3;
+    transition: color 0.25s;
   }
+  .project-card:hover .project-title { color: #fff; }
+
   .project-summary {
-    font-size: 0.88rem;
+    font-size: 0.875rem;
     color: var(--text2);
     font-weight: 300;
-    line-height: 1.6;
+    line-height: 1.7;
   }
+
   .project-features {
     list-style: none;
     display: flex;
     flex-direction: column;
     gap: 7px;
+    flex: 1;
   }
   .project-features li {
-    font-size: 0.82rem;
+    font-size: 0.81rem;
     color: var(--text2);
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    line-height: 1.5;
+    gap: 9px;
+    line-height: 1.55;
   }
   .project-features li::before {
     content: '→';
     color: var(--accent3);
     flex-shrink: 0;
-    font-size: 0.75rem;
-    margin-top: 1px;
+    font-size: 0.72rem;
+    margin-top: 2px;
   }
+
   .project-tech {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px;
+    gap: 6px;
   }
   .tech-tag {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    font-size: 0.67rem;
     color: var(--accent2);
     background: rgba(167,139,250,0.08);
     border: 1px solid rgba(167,139,250,0.18);
     padding: 3px 10px;
     border-radius: 4px;
     letter-spacing: 0.04em;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
   }
+  .project-card:hover .tech-tag {
+    background: rgba(167,139,250,0.14);
+    border-color: rgba(167,139,250,0.3);
+  }
+
   .project-footer {
     margin-top: auto;
-    padding-top: 8px;
+    padding-top: 10px;
     border-top: 1px solid var(--border);
   }
+
   .btn-sm {
     display: inline-flex;
     align-items: center;
@@ -534,6 +675,101 @@
     background: rgba(255,255,255,0.08);
     color: var(--text);
     border-color: rgba(255,255,255,0.14);
+  }
+
+  /* ── RIGHT: image pane ── */
+  .project-img {
+    position: relative;
+    overflow: hidden;
+    background: #06080e;
+    border-left: 1px solid var(--border);
+    min-height: 300px;
+  }
+
+  /* Soft left-edge fade so image blends into the text pane */
+  .project-img::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 80px; height: 100%;
+    background: linear-gradient(90deg, var(--bg2) 0%, transparent 100%);
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .project-card.featured .project-img::after {
+    background: linear-gradient(90deg, rgba(8,12,24,0.95) 0%, transparent 100%);
+  }
+  .project-card:hover .project-img::after { opacity: 0.5; }
+
+  /* Scanline texture over image */
+  .project-img::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.07) 3px,
+      rgba(0,0,0,0.07) 4px
+    );
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .project-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+    display: block;
+    filter: brightness(0.72) saturate(0.85);
+    transform: scale(1.04);
+    transition:
+      transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      filter 0.5s ease,
+      opacity 0.4s ease;
+    opacity: 0.88;
+  }
+  .project-card:hover .project-img img {
+    transform: scale(1.09);
+    filter: brightness(0.96) saturate(1.12);
+    opacity: 1;
+  }
+
+  /* Small corner label on each image */
+  .img-chip {
+    position: absolute;
+    bottom: 12px; right: 12px;
+    z-index: 4;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.38);
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.06);
+    pointer-events: none;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .project-card:hover .img-chip {
+    color: rgba(99,210,255,0.6);
+    border-color: rgba(99,210,255,0.15);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .project-card { grid-template-columns: 1fr; }
+    .project-img {
+      border-left: none;
+      border-top: 1px solid var(--border);
+      min-height: 210px;
+    }
+    .project-img::after { display: none; }
   }
   /* github icon */
   .icon-gh {
@@ -561,12 +797,44 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r);
-    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: transform 0.32s ease, border-color 0.32s ease,
+                background 0.32s ease, box-shadow 0.32s ease;
+  }
+  /* Radial glow that follows the card on hover */
+  .process-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(99,210,255,0.07), transparent 65%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* Top accent line that slides in */
+  .process-item::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1;
   }
   .process-item:hover {
-    border-color: var(--border2);
-    background: var(--surface2);
+    transform: translateY(-6px);
+    border-color: rgba(99,210,255,0.22);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(99,210,255,0.06);
   }
+  .process-item:hover::before { opacity: 1; }
+  .process-item:hover::after  { transform: scaleX(1); }
+
   .process-icon {
     width: 42px; height: 42px;
     border-radius: 10px;
@@ -577,21 +845,37 @@
     justify-content: center;
     font-size: 1.2rem;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: background 0.3s ease, border-color 0.3s ease,
+                transform 0.3s ease, box-shadow 0.3s ease;
   }
-  .process-body {}
+  .process-item:hover .process-icon {
+    background: rgba(99,210,255,0.15);
+    border-color: rgba(99,210,255,0.35);
+    transform: scale(1.1) rotate(-4deg);
+    box-shadow: 0 0 16px rgba(99,210,255,0.2);
+  }
+
+  .process-body { position: relative; z-index: 1; }
   .process-title {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 0.95rem;
     color: var(--text);
     margin-bottom: 6px;
+    transition: color 0.25s ease;
   }
+  .process-item:hover .process-title { color: #fff; }
+
   .process-desc {
     font-size: 0.84rem;
     color: var(--text2);
     line-height: 1.65;
     font-weight: 300;
+    transition: color 0.25s ease;
   }
+  .process-item:hover .process-desc { color: #a0b0cc; }
 
   /* ─── TECH STACK ─── */
   #stack { background: var(--bg2); }
@@ -622,36 +906,144 @@
 
   /* ─── EDUCATION ─── */
   #education { background: var(--bg); }
+
+  @keyframes eduShimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  @keyframes eduOrb {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+    33%       { transform: translate(18px, -12px) scale(1.08); opacity: 1; }
+    66%       { transform: translate(-10px, 10px) scale(0.96); opacity: 0.7; }
+  }
+  @keyframes eduOrb2 {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+    40%       { transform: translate(-20px, 14px) scale(1.1); opacity: 0.9; }
+    70%       { transform: translate(12px, -8px) scale(0.95); opacity: 0.6; }
+  }
+
   .edu-card {
     margin-top: 50px;
+    position: relative;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r2);
-    padding: 40px;
+    padding: 44px 40px;
     display: flex;
     align-items: center;
     gap: 40px;
-    max-width: 700px;
+    max-width: 720px;
+    overflow: hidden;
+    cursor: default;
+    transition: transform 0.38s ease, border-color 0.38s ease,
+                box-shadow 0.38s ease;
   }
+
+  /* Animated mesh background orbs */
+  .edu-card::before {
+    content: '';
+    position: absolute;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(52,211,153,0.13) 0%, transparent 70%);
+    top: -80px; right: -60px;
+    animation: eduOrb 9s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .edu-card::after {
+    content: '';
+    position: absolute;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,210,255,0.1) 0%, transparent 70%);
+    bottom: -50px; left: 60px;
+    animation: eduOrb2 11s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Shimmer sweep on hover */
+  .edu-card .edu-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(255,255,255,0.04) 50%,
+      transparent 70%
+    );
+    background-size: 800px 100%;
+    background-repeat: no-repeat;
+    background-position: -400px 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity 0.2s;
+  }
+  .edu-card:hover .edu-shimmer {
+    opacity: 1;
+    animation: eduShimmer 0.75s ease forwards;
+  }
+
+  .edu-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(52,211,153,0.3);
+    box-shadow:
+      0 24px 50px rgba(0,0,0,0.4),
+      0 0 0 1px rgba(52,211,153,0.08),
+      0 0 40px rgba(52,211,153,0.06);
+  }
+
+  /* Top green accent line slides in on hover */
+  .edu-card .edu-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent3) 50%, transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 2;
+  }
+  .edu-card:hover .edu-line { transform: scaleX(1); }
+
   .edu-icon {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 0 0px rgba(52,211,153,0));
   }
+  .edu-card:hover .edu-icon {
+    transform: scale(1.18) rotate(-5deg);
+    filter: drop-shadow(0 0 12px rgba(52,211,153,0.4));
+  }
+
+  .edu-info { position: relative; z-index: 1; }
+
   .edu-uni {
     font-family: var(--font-display);
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--text);
     margin-bottom: 6px;
+    transition: color 0.25s;
   }
+  .edu-card:hover .edu-uni { color: #fff; }
+
   .edu-degree {
     font-size: 0.92rem;
     color: var(--text2);
     margin-bottom: 12px;
+    transition: color 0.25s;
   }
+  .edu-card:hover .edu-degree { color: #a8c0d8; }
+
   .edu-meta {
     display: flex;
-    gap: 18px;
+    gap: 12px;
     flex-wrap: wrap;
   }
   .edu-pill {
@@ -663,6 +1055,12 @@
     border: 1px solid rgba(52,211,153,0.18);
     padding: 4px 12px;
     border-radius: 4px;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+  .edu-card:hover .edu-pill {
+    background: rgba(52,211,153,0.14);
+    border-color: rgba(52,211,153,0.35);
+    box-shadow: 0 0 10px rgba(52,211,153,0.15);
   }
 
   /* ─── CONTACT ─── */
@@ -694,48 +1092,108 @@
   .contact-links {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
   }
+
+  /* Each contact card */
   .contact-link {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
     padding: 16px 20px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r);
     text-decoration: none;
-    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease,
+                background 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  /* Sliding fill from left */
+  .contact-link::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; bottom: 0;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(99,210,255,0.05) 0%,
+      rgba(99,210,255,0.02) 100%
+    );
+    transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 0;
+  }
+  /* Right-edge accent bar */
+  .contact-link::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, var(--accent), transparent);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.35s ease;
+    z-index: 1;
   }
   .contact-link:hover {
-    border-color: var(--border2);
-    background: var(--surface2);
-    transform: translateX(4px);
+    transform: translateX(6px);
+    border-color: rgba(99,210,255,0.25);
+    background: rgba(255,255,255,0.05);
+    box-shadow: -4px 0 20px rgba(99,210,255,0.08), 0 8px 24px rgba(0,0,0,0.25);
   }
+  .contact-link:hover::before { left: 0; }
+  .contact-link:hover::after  { transform: scaleY(1); }
+
   .contact-icon {
-    width: 36px; height: 36px;
-    border-radius: 8px;
+    width: 40px; height: 40px;
+    border-radius: 10px;
     background: rgba(99,210,255,0.08);
     border: 1px solid rgba(99,210,255,0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 1.1rem;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: background 0.3s ease, border-color 0.3s ease,
+                transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s ease;
   }
-  .contact-info {}
+  .contact-link:hover .contact-icon {
+    background: rgba(99,210,255,0.16);
+    border-color: rgba(99,210,255,0.35);
+    transform: scale(1.12);
+    box-shadow: 0 0 14px rgba(99,210,255,0.2);
+  }
+
+  .contact-info { position: relative; z-index: 1; }
+
   .contact-type {
     font-family: var(--font-mono);
     font-size: 0.67rem;
     letter-spacing: 0.1em;
     color: var(--text3);
     text-transform: uppercase;
+    transition: color 0.25s;
   }
+  .contact-link:hover .contact-type { color: rgba(99,210,255,0.5); }
+
   .contact-value {
     font-size: 0.9rem;
     color: var(--text);
     font-weight: 400;
+    transition: color 0.25s;
   }
+  .contact-link:hover .contact-value { color: #fff; }
+
+  /* Staggered entrance for each contact card */
+  .contact-links .contact-link:nth-child(1) { transition-delay: 0ms; }
+  .contact-links .contact-link:nth-child(2) { transition-delay: 40ms; }
+  .contact-links .contact-link:nth-child(3) { transition-delay: 80ms; }
+  .contact-links .contact-link:nth-child(4) { transition-delay: 120ms; }
 
   /* ─── FOOTER ─── */
   footer {
@@ -758,12 +1216,18 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* Content visible by default — JS enhances with animation */
   .fade-in {
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 1;
+    transform: translateY(0);
     transition: opacity 0.7s ease, transform 0.7s ease;
   }
-  .fade-in.visible {
+  /* JS adds .js-anim class to body, then .fade-in elements start hidden */
+  .js-anim .fade-in {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  .js-anim .fade-in.visible {
     opacity: 1;
     transform: translateY(0);
   }
@@ -774,8 +1238,10 @@
     .about-grid { grid-template-columns: 1fr; gap: 40px; }
     .about-stats { grid-template-columns: 1fr 1fr; }
     .contact-wrap { grid-template-columns: 1fr; }
-    .project-card.featured { grid-column: span 1; }
-    .projects-grid { grid-template-columns: 1fr; }
+    .project-card { grid-template-columns: 1fr; }
+    .project-img { border-left: none; border-top: 1px solid var(--border); min-height: 190px; }
+    .project-img::after { display: none; }
+    .project-text { padding: 24px 20px 20px; }
     .edu-card { flex-direction: column; gap: 20px; }
     .hero-btns { flex-direction: column; align-items: center; }
   }
@@ -852,7 +1318,7 @@
           <div class="stat-label">Production AI Systems</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number">3.91</div>
+          <div class="stat-number">3.92</div>
           <div class="stat-label">CGPA — CS Degree</div>
         </div>
         <div class="stat-card">
@@ -940,123 +1406,153 @@
 
       <!-- 1 — FEATURED -->
       <div class="project-card featured fade-in">
-        <div class="project-num">01 &mdash; FEATURED</div>
-        <div class="project-title">SmartAssist – WhatsApp AI Customer Support System</div>
-        <div class="project-summary">End-to-end AI-powered customer support over WhatsApp with intelligent routing, escalation, and full SLA monitoring.</div>
-        <ul class="project-features">
-          <li>Natural language intent detection with LLaMA 3 via Groq</li>
-          <li>RAG pipeline for context-aware, knowledge-grounded responses</li>
-          <li>Confidence-based routing with automated human escalation</li>
-          <li>Full audit logging via Supabase &amp; SLA breach notifications</li>
-          <li>WhatsApp Business Cloud API webhook integration</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Groq LLaMA 3</span>
-          <span class="tech-tag">n8n</span>
-          <span class="tech-tag">WhatsApp API</span>
-          <span class="tech-tag">Supabase</span>
-          <span class="tech-tag">RAG</span>
+        <div class="project-text">
+          <div class="project-num">01 &mdash; <span class="feat-badge">FEATURED</span></div>
+          <div class="project-title">SmartAssist – WhatsApp AI Customer Support System</div>
+          <div class="project-summary">End-to-end AI-powered customer support over WhatsApp with intelligent routing, escalation, and full SLA monitoring.</div>
+          <ul class="project-features">
+            <li>Natural language intent detection with LLaMA 3 via Groq</li>
+            <li>RAG pipeline for context-aware, knowledge-grounded responses</li>
+            <li>Confidence-based routing with automated human escalation</li>
+            <li>Full audit logging via Supabase &amp; SLA breach notifications</li>
+            <li>WhatsApp Business Cloud API webhook integration</li>
+          </ul>
+          <div class="project-tech">
+            <span class="tech-tag">Groq LLaMA 3</span>
+            <span class="tech-tag">n8n</span>
+            <span class="tech-tag">WhatsApp API</span>
+            <span class="tech-tag">Supabase</span>
+            <span class="tech-tag">RAG</span>
+          </div>
+          <div class="project-footer">
+            <a href="https://github.com/SarmadSiyal/smartassist-ai-whatsapp-support-system" target="_blank" rel="noopener" class="btn-sm">
+              <span class="icon-gh"></span> View on GitHub
+            </a>
+          </div>
         </div>
-        <div class="project-footer">
-          <a href="https://github.com/SarmadSiyal/smartassist-ai-whatsapp-support-system" target="_blank" rel="noopener" class="btn-sm">
-            <span class="icon-gh"></span> View on GitHub
-          </a>
+        <div class="project-img">
+          <img src="images/whatsapp-workflow.png" alt="WhatsApp AI Multi-Agent Workflow Architecture" loading="lazy" />
+          <span class="img-chip">WORKFLOW ARCHITECTURE</span>
         </div>
       </div>
 
       <!-- 2 -->
       <div class="project-card fade-in">
-        <div class="project-num">02</div>
-        <div class="project-title">AI Recruitment Intelligence Agent</div>
-        <div class="project-summary">Automated end-to-end recruitment pipeline — screening, scoring, and scheduling powered by AI.</div>
-        <ul class="project-features">
-          <li>CV parsing &amp; structured candidate scoring</li>
-          <li>LLM-based interview question generation</li>
-          <li>Automated shortlisting and email outreach</li>
-          <li>ATS data sync via REST API</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">LLaMA 3</span>
-          <span class="tech-tag">n8n</span>
-          <span class="tech-tag">Gmail API</span>
-          <span class="tech-tag">Supabase</span>
+        <div class="project-text">
+          <div class="project-num">02</div>
+          <div class="project-title">AI Recruitment Intelligence Agent</div>
+          <div class="project-summary">Automated end-to-end recruitment pipeline — screening, scoring, and scheduling powered by AI.</div>
+          <ul class="project-features">
+            <li>CV parsing &amp; structured candidate scoring</li>
+            <li>LLM-based interview question generation</li>
+            <li>Automated shortlisting and email outreach</li>
+            <li>ATS data sync via REST API</li>
+          </ul>
+          <div class="project-tech">
+            <span class="tech-tag">LLaMA 3</span>
+            <span class="tech-tag">n8n</span>
+            <span class="tech-tag">Gmail API</span>
+            <span class="tech-tag">Supabase</span>
+          </div>
+          <div class="project-footer">
+            <a href="https://github.com/SarmadSiyal/ai-recruitment-automation-agent" target="_blank" rel="noopener" class="btn-sm">
+              <span class="icon-gh"></span> View on GitHub
+            </a>
+          </div>
         </div>
-        <div class="project-footer">
-          <a href="https://github.com/SarmadSiyal/ai-recruitment-automation-agent" target="_blank" rel="noopener" class="btn-sm">
-            <span class="icon-gh"></span> View on GitHub
-          </a>
+        <div class="project-img">
+          <img src="images/recruitment-workflow.png" alt="AI Recruitment Automation Workflow Architecture" loading="lazy" />
+          <span class="img-chip">WORKFLOW ARCHITECTURE</span>
         </div>
       </div>
 
       <!-- 3 -->
       <div class="project-card fade-in">
-        <div class="project-num">03</div>
-        <div class="project-title">AI Commerce Automation Platform</div>
-        <div class="project-summary">Full-stack e-commerce automation — from order processing to AI-driven customer communication.</div>
-        <ul class="project-features">
-          <li>Order intake, tracking, and status update automation</li>
-          <li>AI product description generation at scale</li>
-          <li>Inventory alert &amp; reorder logic</li>
-          <li>Multi-channel notification (email + WhatsApp)</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Make.com</span>
-          <span class="tech-tag">Groq</span>
-          <span class="tech-tag">Google Sheets</span>
-          <span class="tech-tag">WhatsApp API</span>
+        <div class="project-text">
+          <div class="project-num">03</div>
+          <div class="project-title">AI Commerce Automation Platform</div>
+          <div class="project-summary">Full-stack e-commerce automation — from order processing to AI-driven customer communication.</div>
+          <ul class="project-features">
+            <li>Order intake, tracking, and status update automation</li>
+            <li>AI product description generation at scale</li>
+            <li>Inventory alert &amp; reorder logic</li>
+            <li>Multi-channel notification (email + WhatsApp)</li>
+          </ul>
+          <div class="project-tech">
+            <span class="tech-tag">Make.com</span>
+            <span class="tech-tag">Groq</span>
+            <span class="tech-tag">Google Sheets</span>
+            <span class="tech-tag">WhatsApp API</span>
+          </div>
+          <div class="project-footer">
+            <a href="https://github.com/SarmadSiyal/smarttech-ai-commerce-platform" target="_blank" rel="noopener" class="btn-sm">
+              <span class="icon-gh"></span> View on GitHub
+            </a>
+          </div>
         </div>
-        <div class="project-footer">
-          <a href="https://github.com/SarmadSiyal/smarttech-ai-commerce-platform" target="_blank" rel="noopener" class="btn-sm">
-            <span class="icon-gh"></span> View on GitHub
-          </a>
+        <div class="project-img">
+          <img src="images/commerce-workflow.png" alt="AI Commerce Automation Platform Architecture" loading="lazy" />
+          <span class="img-chip">WORKFLOW ARCHITECTURE</span>
         </div>
       </div>
 
       <!-- 4 -->
       <div class="project-card fade-in">
-        <div class="project-num">04</div>
-        <div class="project-title">AI Lead Qualification &amp; CRM Automation</div>
-        <div class="project-summary">Intelligent lead scoring and CRM data entry automation, eliminating manual SDR overhead.</div>
-        <ul class="project-features">
-          <li>Inbound lead capture from forms &amp; emails</li>
-          <li>AI scoring against ICP criteria using structured JSON</li>
-          <li>Automatic CRM record creation &amp; assignment</li>
-          <li>Slack notifications for high-priority leads</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">n8n</span>
-          <span class="tech-tag">LLaMA 3</span>
-          <span class="tech-tag">Slack API</span>
-          <span class="tech-tag">REST APIs</span>
+        <div class="project-text">
+          <div class="project-num">04</div>
+          <div class="project-title">AI Lead Qualification &amp; CRM Automation</div>
+          <div class="project-summary">Intelligent lead scoring and CRM data entry automation, eliminating manual SDR overhead.</div>
+          <ul class="project-features">
+            <li>Inbound lead capture from forms &amp; emails</li>
+            <li>AI scoring against ICP criteria using structured JSON</li>
+            <li>Automatic CRM record creation &amp; assignment</li>
+            <li>Slack notifications for high-priority leads</li>
+          </ul>
+          <div class="project-tech">
+            <span class="tech-tag">n8n</span>
+            <span class="tech-tag">LLaMA 3</span>
+            <span class="tech-tag">Slack API</span>
+            <span class="tech-tag">REST APIs</span>
+          </div>
+          <div class="project-footer">
+            <a href="https://github.com/SarmadSiyal/ai-lead-qualification-crm" target="_blank" rel="noopener" class="btn-sm">
+              <span class="icon-gh"></span> View on GitHub
+            </a>
+          </div>
         </div>
-        <div class="project-footer">
-          <a href="https://github.com/SarmadSiyal/ai-lead-qualification-crm" target="_blank" rel="noopener" class="btn-sm">
-            <span class="icon-gh"></span> View on GitHub
-          </a>
+        <div class="project-img">
+          <img src="images/lead-automation-workflow.png" alt="AI Lead Qualification &amp; CRM Automation Workflow" loading="lazy" />
+          <span class="img-chip">WORKFLOW ARCHITECTURE</span>
         </div>
       </div>
 
       <!-- 5 -->
       <div class="project-card fade-in">
-        <div class="project-num">05</div>
-        <div class="project-title">AI Email Support Automation System</div>
-        <div class="project-summary">Smart inbox automation that triages, drafts, and dispatches support replies autonomously.</div>
-        <ul class="project-features">
-          <li>Email classification &amp; intent extraction</li>
-          <li>Context-aware AI draft generation</li>
-          <li>Confidence threshold &amp; human review gate</li>
-          <li>Thread history awareness via RAG</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Gmail API</span>
-          <span class="tech-tag">Groq</span>
-          <span class="tech-tag">n8n</span>
-          <span class="tech-tag">Supabase</span>
+        <div class="project-text">
+          <div class="project-num">05</div>
+          <div class="project-title">AI Email Support Automation System</div>
+          <div class="project-summary">Smart inbox automation that triages, drafts, and dispatches support replies autonomously.</div>
+          <ul class="project-features">
+            <li>Email classification &amp; intent extraction</li>
+            <li>Context-aware AI draft generation</li>
+            <li>Confidence threshold &amp; human review gate</li>
+            <li>Thread history awareness via RAG</li>
+          </ul>
+          <div class="project-tech">
+            <span class="tech-tag">Gmail API</span>
+            <span class="tech-tag">Groq</span>
+            <span class="tech-tag">n8n</span>
+            <span class="tech-tag">Supabase</span>
+          </div>
+          <div class="project-footer">
+            <a href="https://github.com/SarmadSiyal/ai-email-support-automation" target="_blank" rel="noopener" class="btn-sm">
+              <span class="icon-gh"></span> View on GitHub
+            </a>
+          </div>
         </div>
-        <div class="project-footer">
-          <a href="https://github.com/SarmadSiyal/ai-email-support-automation" target="_blank" rel="noopener" class="btn-sm">
-            <span class="icon-gh"></span> View on GitHub
-          </a>
+        <div class="project-img">
+          <img src="images/email-support-workflow.png" alt="AI Email Support Automation Architecture" loading="lazy" />
+          <span class="img-chip">WORKFLOW ARCHITECTURE</span>
         </div>
       </div>
 
@@ -1152,12 +1648,14 @@
     <div class="section-label fade-in">Education</div>
     <h2 class="section-title fade-in">Academic Background</h2>
     <div class="edu-card fade-in">
+      <span class="edu-line"></span>
+      <span class="edu-shimmer"></span>
       <div class="edu-icon">🎓</div>
-      <div>
+      <div class="edu-info">
         <div class="edu-uni">Quaid-e-Awam University of Engineering Science &amp; Technology</div>
         <div class="edu-degree">BS Computer Science</div>
         <div class="edu-meta">
-          <span class="edu-pill">CGPA: 3.91</span>
+          <span class="edu-pill">CGPA: 3.92</span>
           <span class="edu-pill">Dec 2021 – Aug 2025</span>
         </div>
       </div>
@@ -1175,14 +1673,14 @@
       <div class="fade-in">
         <h2 class="contact-cta">Let's build <span>intelligent automation</span><br>for your business.</h2>
         <p class="contact-sub">Whether you're looking to automate support, qualify leads, or deploy a custom AI agent — I'm available for remote contracts, freelance projects, and full-time roles.</p>
-        <a href="mailto:sarmadsindhi101@gmail.com" class="btn btn-primary">Send an Email</a>
+        <a href="/cdn-cgi/l/email-protection#d7a4b6a5bab6b3a4beb9b3bfbee6e7e697b0bab6bebbf9b4b8ba" class="btn btn-primary">Send an Email</a>
       </div>
       <div class="contact-links fade-in">
-        <a href="mailto:sarmadsindhi101@gmail.com" class="contact-link">
+        <a href="/cdn-cgi/l/email-protection#136072617e7277607a7d777b7a22232253747e727a7f3d707c7e" class="contact-link">
           <div class="contact-icon">✉️</div>
           <div class="contact-info">
             <div class="contact-type">Email</div>
-            <div class="contact-value">sarmadsindhi101@gmail.com</div>
+            <div class="contact-value"><span class="__cf_email__" data-cfemail="2f5c4e5d424e4b5c46414b47461e1f1e6f48424e4643014c4042">[email&#160;protected]</span></div>
           </div>
         </a>
         <a href="tel:+923306664083" class="contact-link">
@@ -1218,12 +1716,15 @@
   <p>© 2026 <span>Sarmad Siyal</span> – AI Automation Specialist</p>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ── INTERSECTION OBSERVER FOR FADE-IN ──
+  // Add js-anim to body so CSS hides elements — safe fallback if JS fails
+  document.documentElement.classList.add('js-anim');
+  document.body.classList.add('js-anim');
+
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
+    entries.forEach((e) => {
       if (e.isIntersecting) {
-        // stagger siblings
         const siblings = [...e.target.parentElement.querySelectorAll('.fade-in')];
         const idx = siblings.indexOf(e.target);
         e.target.style.transitionDelay = (idx * 80) + 'ms';
@@ -1231,7 +1732,7 @@
         observer.unobserve(e.target);
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
@@ -1239,23 +1740,4 @@
   document.querySelectorAll('.project-card').forEach(card => {
     card.addEventListener('mousemove', e => {
       const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-      const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-      card.style.setProperty('--mx', x + '%');
-      card.style.setProperty('--my', y + '%');
-    });
-  });
-
-  // ── SMOOTH SCROLL FOR ANCHOR LINKS ──
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
-</script>
-</body>
-</html>
+      const x = ((e.clientX - rec
