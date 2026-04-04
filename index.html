@@ -515,7 +515,8 @@
     border: 1px solid var(--border);
     border-radius: var(--r2);
     display: grid;
-    grid-template-columns: 1fr 1.05fr;
+    grid-template-columns: 1fr 1.1fr;
+    align-items: stretch;
     overflow: hidden;
     transition: transform 0.38s ease, border-color 0.38s ease,
                 box-shadow 0.38s ease, background 0.38s ease;
@@ -680,10 +681,13 @@
   /* ── RIGHT: image pane ── */
   .project-img {
     position: relative;
-    overflow: hidden;
     background: #06080e;
     border-left: 1px solid var(--border);
-    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    overflow: hidden;
   }
 
   /* Soft left-edge fade so image blends into the text pane */
@@ -691,7 +695,7 @@
     content: '';
     position: absolute;
     top: 0; left: 0;
-    width: 80px; height: 100%;
+    width: 50px; height: 100%;
     background: linear-gradient(90deg, var(--bg2) 0%, transparent 100%);
     z-index: 2;
     pointer-events: none;
@@ -700,7 +704,7 @@
   .project-card.featured .project-img::after {
     background: linear-gradient(90deg, rgba(8,12,24,0.95) 0%, transparent 100%);
   }
-  .project-card:hover .project-img::after { opacity: 0.5; }
+  .project-card:hover .project-img::after { opacity: 0.3; }
 
   /* Scanline texture over image */
   .project-img::before {
@@ -711,8 +715,8 @@
       0deg,
       transparent,
       transparent 3px,
-      rgba(0,0,0,0.07) 3px,
-      rgba(0,0,0,0.07) 4px
+      rgba(0,0,0,0.05) 3px,
+      rgba(0,0,0,0.05) 4px
     );
     z-index: 3;
     pointer-events: none;
@@ -720,22 +724,30 @@
 
   .project-img img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top left;
+    height: auto;
+    max-width: 100%;
+    max-height: 340px;
     display: block;
-    filter: brightness(0.72) saturate(0.85);
-    transform: scale(1.04);
+    object-fit: contain;
+    object-position: center;
+    border-radius: 10px;
+    filter: brightness(0.88) saturate(0.92);
+    transform: scale(1.0);
     transition:
       transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       filter 0.5s ease,
-      opacity 0.4s ease;
-    opacity: 0.88;
+      opacity 0.4s ease,
+      box-shadow 0.5s ease;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
   }
   .project-card:hover .project-img img {
-    transform: scale(1.09);
-    filter: brightness(0.96) saturate(1.12);
+    transform: scale(1.03);
+    filter: brightness(1.0) saturate(1.1);
     opacity: 1;
+    box-shadow: 0 8px 36px rgba(0,0,0,0.6), 0 0 24px rgba(99,210,255,0.1);
   }
 
   /* Small corner label on each image */
@@ -767,7 +779,7 @@
     .project-img {
       border-left: none;
       border-top: 1px solid var(--border);
-      min-height: 210px;
+      padding: 16px;
     }
     .project-img::after { display: none; }
   }
@@ -1673,14 +1685,14 @@
       <div class="fade-in">
         <h2 class="contact-cta">Let's build <span>intelligent automation</span><br>for your business.</h2>
         <p class="contact-sub">Whether you're looking to automate support, qualify leads, or deploy a custom AI agent — I'm available for remote contracts, freelance projects, and full-time roles.</p>
-        <a href="/cdn-cgi/l/email-protection#d7a4b6a5bab6b3a4beb9b3bfbee6e7e697b0bab6bebbf9b4b8ba" class="btn btn-primary">Send an Email</a>
+        <a href="mailto:sarmadsindhi101@gmail.com" class="btn btn-primary">Send an Email</a>
       </div>
       <div class="contact-links fade-in">
-        <a href="/cdn-cgi/l/email-protection#136072617e7277607a7d777b7a22232253747e727a7f3d707c7e" class="contact-link">
+        <a href="mailto:sarmadsindhi101@gmail.com" class="contact-link">
           <div class="contact-icon">✉️</div>
           <div class="contact-info">
             <div class="contact-type">Email</div>
-            <div class="contact-value"><span class="__cf_email__" data-cfemail="2f5c4e5d424e4b5c46414b47461e1f1e6f48424e4643014c4042">sarmadsindhi101@gmail.com</span></div>
+            <div class="contact-value">sarmadsindhi101@gmail.com</div>
           </div>
         </a>
         <a href="tel:+923306664083" class="contact-link">
@@ -1716,7 +1728,7 @@
   <p>© 2026 <span>Sarmad Siyal</span> – AI Automation Specialist</p>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   // ── INTERSECTION OBSERVER FOR FADE-IN ──
   // Add js-anim to body so CSS hides elements — safe fallback if JS fails
   document.documentElement.classList.add('js-anim');
@@ -1734,10 +1746,4 @@
     });
   }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-  // ── MOUSE GLOW ON PROJECT CARDS ──
-  document.querySelectorAll('.project-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rec
+  document.qu
